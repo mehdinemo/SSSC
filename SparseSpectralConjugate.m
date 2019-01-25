@@ -1,26 +1,27 @@
-function [f_value, x] = SparseSpectralConjugate(L,jaygasht)
+function [f_value, x] = SparseSpectralConjugate(SM, SD,x_0)
 
 %L is laplacian matrix
 %x_k is estimation of eigenvector corresponding to second-smallest eigenvalue
 
 format long;
-K = size(L,1);
+K = size(SD,1);
 e = ones(1,K);
-x = zeros(K,1);
+rand_x = zeros(K,1);
 for i=1:K
-    x(i)=i-(K+1)/2;
+    rand_x(i)=i-(K+1)/2;
 end
 
 switch nargin
+    case 3
+        x=x_0;%(jaygasht);
     case 2
-        x=x(jaygasht);
-    case 1
-        x=x(randperm(K));
+        x=rand_x(randperm(K));%x(randperm(K));
 end
-x=x(randperm(K));
+% x
+% x=x(randperm(K));
 x_k = x-((e*x/(e*e'))*e)';
 rho_k = x_k'*x_k;
-y_k = L*x_k;
+y_k = SparseMoltiply(SM, SD, x_k);% L*x_k;
 F_k = x_k'*y_k/rho_k;
 g_k = 2/rho_k*(F_k*x_k-y_k);
 h_k = g_k;
@@ -34,7 +35,7 @@ for k=1:K
     beta = beta_k;
     h = h_k;
     
-    y_k = L*h;
+    y_k = SparseMoltiply(SM, SD, h);% L*h;
     p_k = rho; q_k = 2*x'*h; r_k = h'*h;
     s_k = rho*F; t_k = 2*x'*y_k; u_k = h'*y_k;
     alpha_k = (-(u_k*p_k-s_k*r_k)+...
@@ -52,5 +53,6 @@ for k=1:K
     beta_k = g_k'*g_k;
     h_k = g_k+(beta_k/beta)*h;
 end
+k
 x = x_k./norm(x_k);
-f_value = x'*L*x;
+f_value = x'*SparseMoltiply(SM, SD, x);% L*x;
