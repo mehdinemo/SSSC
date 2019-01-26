@@ -1,4 +1,4 @@
-function [f_value, x] = SparseSpectralConjugate(SM, SD,x_0)
+function [f_value, x, k] = SparseSpectralConjugate(SM, SD,x_0)
 
 %L is laplacian matrix
 %x_k is estimation of eigenvector corresponding to second-smallest eigenvalue
@@ -53,6 +53,6 @@ for k=1:K
     beta_k = g_k'*g_k;
     h_k = g_k+(beta_k/beta)*h;
 end
-k
+% k
 x = x_k./norm(x_k);
 f_value = x'*SparseMoltiply(SM, SD, x);% L*x;

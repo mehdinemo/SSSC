@@ -5,8 +5,9 @@ clc
 X=iris_dataset';
 X=X(1:100,:);
 X = X./max(X);
-
 N=size(X,1);
+ind =randperm(N);
+% X = X(ind,:);
 
 A = pdist(X);
 % A = A/(max(max(A)));
@@ -22,13 +23,63 @@ A = AA>0.40;
 D = diag(sum(A,1));
 L = D-A;
 
-[SM, SD] = SymmetricSparse(A);
+[s,~] = eig(L);
+s=s(:,2);
 
-x_0 = ones(size(SD,1),1);
-x_0 = 0.5 * x_0;
-x_0(51:100) = -x_0(51:100);
+G = graph(A);
+plot(G)
+
+[SM, SD] = SymmetricSparse(A);
 %%
-[f_value, x] = SparseSpectralConjugate(SM, SD,x_0);
+x_0 = 0.5 * ones(N,1);
+% x_0(51:100) = -x_0(51:100);
+% x_0 = x_0(ind,:);
+pos=[];
+neg=[];
+% % p_ind=randperm(100);
+% % ii=1;
+% % while length(pos)<10
+% %     if(p_ind(ii)>50)
+% %         pos = [pos,p_ind(ii)];
+% %     end
+% %     ii = ii+1;
+% % end
+% % neg=randperm(50,10);
+r=randperm(100,15);
+for i=1:length(r)
+    if r(i)<51
+       neg=[neg,r(i)];
+    else
+       pos=[pos,r(i)];
+    end
+end
+
+sum([SD(pos);SD(neg)])
+%%
+count=0;
+for j=1:1000
+    x_0 = 0.5 * ones(N,1);
+    random_ind=randperm(N);
+    for i=1:length(r)
+%         random_ind(find(random_ind==pos(i)))=[];
+%         random_ind(find(random_ind==neg(i)))=[];
+        random_ind(find(random_ind==r(i)))=[];
+    end
+    random_ind = [pos,random_ind,neg];
+
+    x_0(random_ind(51:100)) = -x_0(random_ind(51:100));
+
+    [f_value, x, k] = SparseSpectralConjugate(SM, SD, x_0);
+    count = count+k;
+end
+count/1000
+%%
+count=0;
+for i=1:1000
+    [f_value, x, k] = SparseSpectralConjugate(SM, SD);
+    count = count+k;
+end
+count/1000
 
 %%
 % [s,u] = eig(L);
@@ -55,19 +106,4 @@ for i=1:size(label_B,1)
     label_fB(find(idx==i))=label_B(i);
     label_fBS(find(idx==i))=label_BS(i);
 end
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
