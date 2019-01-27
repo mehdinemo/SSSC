@@ -31,6 +31,8 @@ plot(G)
 
 [SM, SD] = SymmetricSparse(A);
 %%
+fid = fopen('Results.txt', 'w');
+for iii=1:100
 x_0 = 0.5 * ones(N,1);
 % x_0(51:100) = -x_0(51:100);
 % x_0 = x_0(ind,:);
@@ -45,17 +47,24 @@ neg=[];
 % %     ii = ii+1;
 % % end
 % % neg=randperm(50,10);
+in=0;
+out=0;
 r=randperm(100,15);
+L1 = length(find(r<51));
 for i=1:length(r)
     if r(i)<51
-       neg=[neg,r(i)];
+        in = in+sum(A(r(i),1:50));
+        out = out+sum(A(r(i),51:100));
+        neg=[neg,r(i)];
     else
-       pos=[pos,r(i)];
+        in = in+sum(A(r(i),51:100));
+        out = out+sum(A(r(i),1:50));
+        pos=[pos,r(i)];
     end
 end
 
-sum([SD(pos);SD(neg)])
-%%
+s=sum([SD(pos);SD(neg)]);
+
 count=0;
 for j=1:1000
     x_0 = 0.5 * ones(N,1);
@@ -72,7 +81,10 @@ for j=1:1000
     [f_value, x, k] = SparseSpectralConjugate(SM, SD, x_0);
     count = count+k;
 end
-count/1000
+count=count/1000;
+fprintf(fid,'In=%d, Out=%d, Sum=%d, Count=%d%, L1=%d',in,out,s,count,L1);
+end
+fclose(fid);
 %%
 count=0;
 for i=1:1000
