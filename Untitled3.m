@@ -37,5 +37,3 @@ SD=DegreSparse(SM);
 
 
 
-
-
