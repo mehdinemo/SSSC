@@ -1,4 +1,4 @@
-function [f_value, x] = Spectral_Conjugate(L,x_0)
+function [f_value, x, k] = Spectral_Conjugate(L,x_0)
 
 %L is laplacian matrix
 %x_k is estimation of eigenvector corresponding to second-smallest eigenvalue
@@ -15,7 +15,7 @@ switch nargin
     case 2
         x=x_0;%(jaygasht);
     case 1
-        x=rand_x(randperm(K));%x(randperm(K));
+        x=rand_x;%(randperm(K));%x(randperm(K));
 end
 
 % x=x(randperm(K));
